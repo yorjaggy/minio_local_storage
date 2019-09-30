@@ -1,0 +1,52 @@
+version: '3.3'
+
+services:
+  minio1:
+    image: i2thub.icesi.edu.co:5000/minio:RELEASE.2019-09-26T19-42-35Z
+    hostname: minio1
+    volumes:
+      - minio-guaral-data1-1:/data
+    ports:
+      - "9312:9000"
+    networks:
+      - minio_distributed_swarm
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server http://minio{1...2}/data
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #   interval: 30s
+    #   timeout: 20s
+    #   retries: 3
+
+  minio2:
+    image: i2thub.icesi.edu.co:5000/minio:RELEASE.2019-09-26T19-42-35Z
+    hostname: minio2
+    volumes:
+      - minio-guaral-data2-1:/data
+    ports:
+      - "9313:9000"
+    networks:
+      - minio_distributed_swarm
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server http://minio{1...2}/data
+    #command: server http://minio{1...2}/export
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #   interval: 30s
+    #   timeout: 20s
+    #   retries: 3
+
+
+## By default this config uses default local driver,
+## For custom volumes replace with volume driver configuration.
+volumes:
+  minio-guaral-data1-1:
+  minio-guaral-data2-1:
+
+networks:
+  minio_distributed_swarm:
+    driver: overlay
